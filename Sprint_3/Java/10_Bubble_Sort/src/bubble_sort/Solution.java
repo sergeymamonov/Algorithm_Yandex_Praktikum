@@ -9,11 +9,12 @@ import java.util.StringTokenizer;
 public class Solution {
     public static void main(String[] args) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        int elementQuantity = Integer.parseInt(bufferedReader.readLine());
+        int numberQuantity = Integer.parseInt(bufferedReader.readLine());
         StringTokenizer stringTokenizer = new StringTokenizer(bufferedReader.readLine());
         bufferedReader.close();
-        ArrayList<Integer> arrayList = new ArrayList<>(elementQuantity);
-        for (int i = 0; i < elementQuantity; i++) {
+        ArrayList<Integer> arrayList = new ArrayList<>(numberQuantity);
+        StringBuffer stringBuffer = new StringBuffer("");
+        for (int i = 0; i < numberQuantity; i++) {
             arrayList.add(Integer.parseInt(stringTokenizer.nextToken()));
         }
         boolean isSortedYet = true;
@@ -29,19 +30,21 @@ public class Solution {
                 }
             }
             if (isSortedYet) {
-                for (Integer integer : arrayList) {
-                    System.out.print(integer + " ");
-                }
-                System.out.println("");
+                print(arrayList, stringBuffer);
                 break;
             }
             if (isSorted) {
                 break;
             }
-            for (Integer integer : arrayList) {
-                System.out.print(integer + " ");
-            }
-            System.out.println("");
+            print(arrayList, stringBuffer);
         }
+    }
+
+    private static void print(ArrayList<Integer> arrayList, StringBuffer stringBuffer) {
+        for (Integer number : arrayList) {
+            stringBuffer.append(number).append(" ");
+        }
+        System.out.println(stringBuffer.toString());
+        stringBuffer.setLength(0);
     }
 }
