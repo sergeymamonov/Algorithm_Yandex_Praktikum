@@ -14,19 +14,28 @@ public class Solution {
             System.out.println("NO");
             return;
         }
-        HashMap<String, String> map = new HashMap<>();
-        String symbol;
-        String newSymbol;
+        HashMap<Character, Character> map1 = new HashMap<>();
+        HashMap<Character, Character> map2 = new HashMap<>();
+        char symbol1;
+        char symbol2;
+        char newSymbol1;
+        char newSymbol2;
         for (int i = 0; i < line1.length(); i++) {
-            symbol = line1.substring(i, i + 1);
-            if (map.containsKey(symbol)) {
-                newSymbol = map.get(symbol);
-                if (!newSymbol.equals(line2.substring(i, i + 1))) {
+            symbol1 = line1.charAt(i);
+            symbol2 = line2.charAt(i);
+            if ((map1.containsKey(symbol1) && !map2.containsKey(symbol2)) || (!map1.containsKey(symbol1) && map2.containsKey(symbol2))) {
+                System.out.println("NO");
+                return;
+            } else if (map1.containsKey(symbol1) && map2.containsKey(symbol2)) {
+                newSymbol1 = map1.get(symbol1);
+                newSymbol2 = map2.get(symbol2);
+                if (newSymbol1 != symbol2 || newSymbol2 != symbol1) {
                     System.out.println("NO");
                     return;
                 }
             } else {
-                map.put(symbol, line2.substring(i, i + 1));
+                map1.put(symbol1, symbol2);
+                map2.put(symbol2, symbol1);
             }
         }
         System.out.println("YES");

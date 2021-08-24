@@ -1,4 +1,4 @@
-//52299977
+//52322134
 
 // Принцип работы алгоритма:
 //      Хэш-таблица содержит в себе элементы, состоящие из ключа и значения. Все реализованные операции (сохранение,
@@ -25,8 +25,8 @@
 //      будет O(1).
 //
 //Пространственная сложность:
-//Задействуется память в размере массива размером, равным количеству корзин. И память на связанные списке в корзинах.
-//Таким образом пространственная сложность будет O[N + M], где M - количество корзин.
+//      Задействуется память в размере массива размером, равным количеству корзин. И память на связанные списке в корзинах.
+//      Таким образом пространственная сложность будет O[N + M], где M - количество корзин.
 
 
 package hash_table;
@@ -44,34 +44,35 @@ public class Solution {
         StringBuffer stringBuffer = new StringBuffer("");
         int commandsQuantity = Integer.parseInt(bufferedReader.readLine());
         for (int i = 0; i < commandsQuantity; i++) {
-            int key;
-            int value;
-            StringTokenizer stringTokenizer = new StringTokenizer(bufferedReader.readLine());
-            String command = stringTokenizer.nextToken();
-            switch (command) {
-                case ("put"):
-                    key = Integer.parseInt(stringTokenizer.nextToken());
-                    value = Integer.parseInt(stringTokenizer.nextToken());
-                    table.put(key, value);
-                    break;
-                case ("get"):
-                    key = Integer.parseInt(stringTokenizer.nextToken());
-                    try {
-                        stringBuffer.append(table.get(key)).append("\n");
-                    } catch (NoSuchElementException e) {
-                        stringBuffer.append("None").append("\n");
-                    }
-                    break;
-                case ("delete"):
-                    key = Integer.parseInt(stringTokenizer.nextToken());
-                    try {
-                        stringBuffer.append(table.delete(key)).append("\n");
-                    } catch (NoSuchElementException e) {
-                        stringBuffer.append("None").append("\n");
-                    }
-            }
+            StringTokenizer line = new StringTokenizer(bufferedReader.readLine());
+            hashTableHandler(table, line, stringBuffer);
         }
         System.out.println(stringBuffer.toString());
+    }
+
+    private static void hashTableHandler(HashTable table, StringTokenizer line, StringBuffer stringBuffer) {
+        String command = line.nextToken();
+        int key = Integer.parseInt(line.nextToken());
+        int value;
+        switch (command) {
+            case ("put"):
+                value = Integer.parseInt(line.nextToken());
+                table.put(key, value);
+                break;
+            case ("get"):
+                try {
+                    stringBuffer.append(table.get(key)).append("\n");
+                } catch (NoSuchElementException e) {
+                    stringBuffer.append("None").append("\n");
+                }
+                break;
+            case ("delete"):
+                try {
+                    stringBuffer.append(table.delete(key)).append("\n");
+                } catch (NoSuchElementException e) {
+                    stringBuffer.append("None").append("\n");
+                }
+        }
     }
 }
 
@@ -87,70 +88,68 @@ class HashTable {
         if (table[hash(key)] == null) {
             Node newNode = new Node(null, key, value);
             table[hash(key)] = newNode;
-        } else {
-            Node previousNode = table[hash(key)];
-            if (previousNode.getKey() == key) {
-                previousNode.setValue(value);
-                return;
-            }
-            Node nextNode = table[hash(key)].getNext();
-            while (nextNode != null) {
-                if (nextNode.getKey() == key) {
-                    nextNode.setValue(value);
-                    return;
-                }
-                previousNode = nextNode;
-                nextNode = previousNode.getNext();
-            }
-            Node newNode = new Node(null, key, value);
-            previousNode.setNext(newNode);
+            return;
         }
-    }
 
-    public int get(int key) throws NoSuchElementException {
-        chekExistKey(key);
         Node previousNode = table[hash(key)];
         if (previousNode.getKey() == key) {
-            return previousNode.getValue();
+            previousNode.setValue(value);
+            return;
         }
+
         Node nextNode = table[hash(key)].getNext();
         while (nextNode != null) {
             if (nextNode.getKey() == key) {
-                break;
+                nextNode.setValue(value);
+                return;
             }
             previousNode = nextNode;
             nextNode = previousNode.getNext();
         }
-        if (nextNode == null) {
-            throw new NoSuchElementException();
+        Node newNode = new Node(null, key, value);
+        previousNode.setNext(newNode);
+    }
+
+    public int get(int key) throws NoSuchElementException {
+        chek(key);
+        Node previousNode = table[hash(key)];
+        if (previousNode.getKey() == key) {
+            return previousNode.getValue();
         }
-        return nextNode.getValue();
+
+        Node nextNode = table[hash(key)].getNext();
+        while (nextNode != null) {
+            if (nextNode.getKey() == key) {
+                return nextNode.getValue();
+            }
+            previousNode = nextNode;
+            nextNode = previousNode.getNext();
+        }
+        throw new NoSuchElementException();
     }
 
     public int delete(int key) throws NoSuchElementException {
-        chekExistKey(key);
+        chek(key);
         Node previousNode = table[hash(key)];
         if (previousNode.getKey() == key) {
             table[hash(key)] = previousNode.getNext();
             return previousNode.getValue();
         }
+
         Node nextNode = table[hash(key)].getNext();
         while (nextNode != null) {
             if (nextNode.getKey() == key) {
-                break;
+                int result = nextNode.getValue();
+                previousNode.setNext(nextNode.getNext());
+                return result;
             }
             previousNode = nextNode;
             nextNode = previousNode.getNext();
         }
-        if (nextNode == null) {
-            throw new NoSuchElementException();
-        }
-            int result = nextNode.getValue();
-            previousNode.setNext(nextNode.getNext());
-            return result;
+        throw new NoSuchElementException();
     }
 
-    private void chekExistKey(int key) {
+    private void chek(int key) {
         if (table[hash(key)] == null) {
             throw new NoSuchElementException();
         }
