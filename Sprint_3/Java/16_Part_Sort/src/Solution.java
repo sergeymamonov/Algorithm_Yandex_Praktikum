@@ -13,25 +13,15 @@ public class Solution {
         for (int i = 0; i < numberQuantity; i++) {
             numbers.add(Integer.parseInt(stringTokenizer.nextToken()));
         }
-        int index = 0;
-        int number = 0;
-        int result = 0;
-        int max = 0;
-        while (index < numberQuantity) {
-            if (numbers.get(index) > max) {
-                max = numbers.get(index);
-            }
-            if (numbers.get(index) == number && index == max) {
-                result++;
-                index++;
-                number = index;
-            } else {
-                index++;
+
+        int parts = 0;
+        int max = Integer.MIN_VALUE;
+        for (int i = 0; i < numberQuantity; i++) {
+            max = Math.max(max, numbers.get(i));
+            if (max == i) {
+                parts++;
             }
         }
-        if (result == 0) {
-            result = 1;
-        }
-        System.out.println(result);
+        System.out.println(parts);
     }
 }

@@ -21,12 +21,20 @@ public class Solution {
             southIslands.add(Integer.parseInt(stringTokenizer.nextToken()));
         }
 
-        int i = 0;
-        int j = 0;
-        int k = 0;
 
-        while (i < northIslandsQuantity && j < southIslandsQuantity) {
-            if
+    }
+
+    public static int getMedian(ArrayList<Integer> a, int a_size, ArrayList<Integer> b, int b_size, int k) {
+        if (a_size > b_size) {
+            return getMedian(b, b_size, a, a_size, k);
+        }
+
+        if (a_size == 0) {
+            return b.get(k - 1);
+        }
+
+        if (k == 1) {
+            return
         }
     }
 }

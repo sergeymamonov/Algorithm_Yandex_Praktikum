@@ -1,47 +1,51 @@
+import java.util.ArrayList;
+
 public class Solution {
     public static int[] merge(int[] arr, int left, int mid, int right) {
-        int i = 0;
+        int i = left;
         int j = mid;
-        int k = 0;
-        int[] result = new int[arr.length];
+        ArrayList<Integer> result = new ArrayList<>();
 
-        while (i < mid && j < arr.length) {
-            if (arr[i] <= arr[j]) {
-                result[k] = arr[i];
+        while (i < mid && j < right) {
+            if (arr[i] < arr[j]) {
+                result.add(arr[i]);
                 i++;
             } else {
-                result[k] = arr[j];
+                result.add(arr[j]);
                 j++;
             }
-            k++;
         }
 
         while (i < mid) {
-            result[k] = arr[i];
-            k++;
+            result.add(arr[i]);
             i++;
         }
 
-        while (j < arr.length) {
-            result[k] = arr[j];
-            k++;
+        while (j < right) {
+            result.add(arr[j]);
             j++;
         }
-        return result;
+
+        int[] answer = new int[result.size()];
+        for (int k = 0; k < result.size(); k++) {
+            answer[k] = result.get(k);
+        }
+        return answer;
     }
 
     public static void merge_sort(int[] arr, int left, int right) {
-        if (left + 1 == right) {
+        if (right - left <= 1) {
             return;
         }
+
         int mid = (left + right) / 2;
         merge_sort(arr, left, mid);
         merge_sort(arr, mid, right);
-
-        int i = 0;
-        for (Integer number : merge(arr, left, mid, right)) {
-            arr[i] = number;
-            i++;
+        
+        int[] result = merge(arr, left, mid, right);
+        int j = 0;
+        for (int i = left; i < right; i++) {
+            arr[i] = result[j++];
         }
     }
 
