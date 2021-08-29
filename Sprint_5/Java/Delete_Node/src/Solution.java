@@ -1,10 +1,16 @@
+//52483646
+//
+//
+//
+
+
+
+
 public class Solution {
     public static Node remove(Node root, int key) {
-        /*
         if (root == null) {
             return null;
         }
-         */
 
         Node currentNode = root;
         Node parentNode = root;
@@ -12,7 +18,7 @@ public class Solution {
 
         while (currentNode.getValue() != key) {
             parentNode = currentNode;
-            if (key < root.getValue()) {
+            if (key < currentNode.getValue()) {
                 isLeftChild = true;
                 currentNode = currentNode.getLeft();
             } else {
@@ -20,66 +26,76 @@ public class Solution {
                 currentNode = currentNode.getRight();
             }
             if (currentNode == null) {
-                return null;
+                return root;
             }
         }
 
         if (currentNode.getLeft() == null && currentNode.getRight() == null) {
-            if (currentNode == root) {
-                root = null;
-            } else if (isLeftChild) {
-                parentNode.setLeft(null);
-            } else {
-                parentNode.setRight(null);
-            }
+            root = deleteLeaf(root, currentNode, parentNode, isLeftChild, null);
         } else if (currentNode.getRight() == null) {
-            if (currentNode == root) {
-                root = currentNode.getLeft();
-            } else if (isLeftChild) {
-                parentNode.setLeft(currentNode.getLeft());
-            } else {
-                parentNode.setRight(currentNode.getLeft());
-            }
+            root = deleteLeftChild(root, currentNode, parentNode, isLeftChild);
         } else if (currentNode.getLeft() == null) {
-            if (currentNode == root) {
-                root = currentNode.getRight();
-            } else if (isLeftChild) {
-                parentNode.setLeft(currentNode.getRight());
-            } else {
-                parentNode.setRight(parentNode.getRight());
-            }
+            root = deleteRightChild(root, currentNode, parentNode, isLeftChild);
         } else {
             Node heir = getHeir(currentNode);
-            if (currentNode == root) {
-                root = heir;
-            } else if (isLeftChild) {
-                parentNode.setLeft(heir);
-            } else {
-                parentNode.setRight(heir);
-            }
+            root = deleteLeaf(root, currentNode, parentNode, isLeftChild, heir);
         }
 
+        return root;
+    }
+
+    private static Node deleteLeaf(Node root, Node currentNode, Node parentNode, boolean isLeftChild, Node heir) {
+        if (currentNode == root) {
+            root = heir;
+        } else if (isLeftChild) {
+            parentNode.setLeft(heir);
+        } else {
+            parentNode.setRight(heir);
+        }
+        return root;
+    }
+
+    private static Node deleteLeftChild(Node root, Node currentNode, Node parentNode, boolean isLeftChild) {
+        if (currentNode == root) {
+            root = currentNode.getLeft();
+        } else if (isLeftChild) {
+            parentNode.setLeft(currentNode.getLeft());
+        } else {
+            parentNode.setRight(currentNode.getLeft());
+        }
+        return root;
+    }
+
+    private static Node deleteRightChild(Node root, Node currentNode, Node parentNode, boolean isLeftChild) {
+        if (currentNode == root) {
+            root = currentNode.getRight();
+        } else if (isLeftChild) {
+            parentNode.setLeft(currentNode.getRight());
+        } else {
+            parentNode.setRight(currentNode.getRight());
+        }
         return root;
     }
 
     public static Node getHeir(Node node) {
         Node parentNode = node;
         Node heirNode = node;
-        Node currentNode = node.getRight();
+        Node currentNode = node.getLeft();
         while (currentNode != null) {
             parentNode = heirNode;
             heirNode = currentNode;
-            currentNode = currentNode.getLeft();
+            currentNode = currentNode.getRight();
         }
 
-        if (heirNode != node.getRight()) {
-            parentNode.setLeft(heirNode.getRight());
-            heirNode.setRight(node.getRight());
+        if (heirNode != node.getLeft()) {
+            parentNode.setRight(heirNode.getLeft());
+            heirNode.setLeft(node.getLeft());
         }
+        heirNode.setRight(node.getRight());
         return heirNode;
     }
 
-        /** Comment it before submitting
+            /** Comment it before submitting
     private static class Node {
         private int value;
         private Node left;

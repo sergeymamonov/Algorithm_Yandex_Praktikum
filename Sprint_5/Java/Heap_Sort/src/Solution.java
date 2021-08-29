@@ -1,3 +1,6 @@
+//52474841
+
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,15 +26,15 @@ public class Solution {
 
     public static void heapSort(Participant[] participants) {
         ArrayList<Participant> heap = new ArrayList<>();
+        Participant fakeParticipant = new Participant("fake", Integer.MIN_VALUE, Integer.MAX_VALUE);
+        heap.add(fakeParticipant);
 
         for (Participant participant : participants) {
             heapAdd(heap, participant);
         }
 
-        int i = 0;
-        while (!heap.isEmpty()) {
-            participants[i] = getMaxPriority(heap);
-            i++;
+        for (int j = 0; j < participants.length; j++) {
+            participants[j] = getMaxPriority(heap);
         }
     }
 
@@ -44,14 +47,14 @@ public class Solution {
     }
 
     private static void heapAdd(ArrayList<Participant> heap, Participant key) {
-        int index = heap.size() + 1;
-        heap.set(index, key);
-        siftUp(heap, index);
+        heap.add(key);
+        siftUp(heap, heap.size() - 1);
     }
 
     private static Participant getMaxPriority(ArrayList<Participant> heap) {
         Participant result = heap.get(1);
         heap.set(1, heap.get(heap.size() - 1));
+        heap.remove(heap.size() - 1);
         siftDown(heap, 1);
         return result;
     }
@@ -62,29 +65,46 @@ public class Solution {
         }
 
         int parentIndex = index / 2;
-        if (heap.get(parentIndex) < heap.get(index)) {
-
+        if (compare(heap.get(parentIndex), heap.get(index))) {
+            swap(heap, parentIndex, index);
+            siftUp(heap, parentIndex);
         }
     }
 
     private static void siftDown(ArrayList<Participant> heap, int index) {
         int left = 2 * index;
-        int right = 2 * index;
+        int right = 2 * index + 1;
 
-        if (heap.size() < left) {
+        if (left >= heap.size()) {
             return;
         }
 
         int indexLargest;
-        if (right <= heap.size() && heap.get(left) < heap.get(right)) {
+        if (right < heap.size() && compare(heap.get(left), heap.get(right))) {
             indexLargest = right;
         } else {
             indexLargest = left;
         }
 
-        if (heap.get(index) < heap.get(indexLargest)) {
+        if (compare(heap.get(index), heap.get(indexLargest))) {
             swap(heap, index, indexLargest);
             siftDown(heap, indexLargest);
+        }
+    }
+
+    private static boolean compare(Participant participant1, Participant participant2) {
+        if (participant1.getSolvedProblems() < participant2.getSolvedProblems()) {
+            return true;
+        } else if (participant1.getSolvedProblems() > participant2.getSolvedProblems()) {
+            return false;
+        } else {
+            if (participant1.getPenalty() > participant2.getPenalty()) {
+                return true;
+            } else if (participant1.getPenalty() < participant2.getPenalty()) {
+                return false;
+            } else {
+                return participant1.getLogin().compareTo(participant2.getLogin()) > 0;
+            }
         }
     }
 
