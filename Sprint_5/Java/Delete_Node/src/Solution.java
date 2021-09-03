@@ -1,10 +1,38 @@
-//52483646
+//52529788
 //
+// Принцип работы алгоритма:
+//      Сначала находится искомый узел. Если такого узла нет, то возвращается корень дерева. Само дерево остается
+//      без изменений.
+//      Далее определяется к какому варианту относится удаляемый узел:
+//          - является листом;
+//          - имеет только левого потомка;
+//          - имеет только правого потомка;
+//          - имеет левого и правого сына.
+//      Далее описывается реализация каждого из перечисленных случаев:
+//          - В случае, если удалемый узел является листом, то у его родителя нужно выставить null вместо ссылки на этот
+//      удялаемый узел.
+//          - В случае, если удаляемый узел имеет только левого потомка, то у родительского узла нужно выставить ссылку
+//      на левого потомка удаляемого узла вместо ссылки на удаляемый узел.
+//          - В случае, если удаляемый узел имеет только правого потомка, то у родительского узла нужно выставить ссылку
+//      на правого потомка удаляемого узла вместо ссылки на удаляемый узел.
+//          - В случае, если удаляемый узел имеет и левого и правого потомка, то нужно найти элемент наследник. Это будет
+//      самый правый элемент левого поддерева. Если у этого элемента есть правое поддерево, то привязать его к родителю
+//      найденного узла справа. Найденный узел делается родителем левого и правого поддеревьев и заменяет удалемый узел
+//      у его родителя.
 //
+// Обоснование корректности:
+//      Алгоритм корректен, так как реализуются все случаи при удалении узла из дерева.
 //
-
-
-
+// Временная сложность:
+//      Временная сложность будет складываться из:
+//          - нахождения нужного узла, в худшем слечае это O(H);
+//          - удалении узла, это либо O(1), либо O(Hоставшейся части дерева) в случае, если после удаления узла
+//              остаются два поддерева, при этом в первом пункте высота составляла менее чем O(H) + O(1).
+//      В итоге суммарая временная сложность в среднем составляет O(logN), где N - количество элементов в дереве.
+//
+// Пространственная сложность:
+//      Пространственная сложность составляет O(N), где N - количество элементов в дереве. Дополнительные структуры
+//      данных не создаются.
 
 public class Solution {
     public static Node remove(Node root, int key) {
@@ -31,20 +59,20 @@ public class Solution {
         }
 
         if (currentNode.getLeft() == null && currentNode.getRight() == null) {
-            root = deleteLeaf(root, currentNode, parentNode, isLeftChild, null);
+            root = deleteNode(root, currentNode, parentNode, isLeftChild, null);
         } else if (currentNode.getRight() == null) {
-            root = deleteLeftChild(root, currentNode, parentNode, isLeftChild);
+            root = deleteIfHaveOnlyLeftChild(root, currentNode, parentNode, isLeftChild);
         } else if (currentNode.getLeft() == null) {
-            root = deleteRightChild(root, currentNode, parentNode, isLeftChild);
+            root = deleteIfHaveOnlyRightChild(root, currentNode, parentNode, isLeftChild);
         } else {
             Node heir = getHeir(currentNode);
-            root = deleteLeaf(root, currentNode, parentNode, isLeftChild, heir);
+            root = deleteNode(root, currentNode, parentNode, isLeftChild, heir);
         }
 
         return root;
     }
 
-    private static Node deleteLeaf(Node root, Node currentNode, Node parentNode, boolean isLeftChild, Node heir) {
+    private static Node deleteNode(Node root, Node currentNode, Node parentNode, boolean isLeftChild, Node heir) {
         if (currentNode == root) {
             root = heir;
         } else if (isLeftChild) {
@@ -55,7 +83,7 @@ public class Solution {
         return root;
     }
 
-    private static Node deleteLeftChild(Node root, Node currentNode, Node parentNode, boolean isLeftChild) {
+    private static Node deleteIfHaveOnlyLeftChild(Node root, Node currentNode, Node parentNode, boolean isLeftChild) {
         if (currentNode == root) {
             root = currentNode.getLeft();
         } else if (isLeftChild) {
@@ -66,7 +94,7 @@ public class Solution {
         return root;
     }
 
-    private static Node deleteRightChild(Node root, Node currentNode, Node parentNode, boolean isLeftChild) {
+    private static Node deleteIfHaveOnlyRightChild(Node root, Node currentNode, Node parentNode, boolean isLeftChild) {
         if (currentNode == root) {
             root = currentNode.getRight();
         } else if (isLeftChild) {
