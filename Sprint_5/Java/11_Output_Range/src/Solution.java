@@ -4,16 +4,24 @@ import java.io.OutputStreamWriter;
 
 public class Solution {
     public static void printRange(Node root, int L, int R, BufferedWriter writer) throws IOException {
-        Node currentNode = root;
-        Node parentNode = root;
-        while (currentNode.getValue() >= L) {
-        parentNode = currentNode;
-        if ()
+        if (root == null) {
+            return;
         }
 
+        if (root.getValue() < L) {
+            printRange(root.getRight(), L, R, writer);
+        } else if (root.getValue() > R) {
+            printRange(root.getLeft(), L, R, writer);
+        } else {
+            printRange(root.getLeft(), L, R, writer);
+            writer.write(root.getValue());
+            printRange(root.getLeft(), L, R, writer);
+        }
+
+        writer.flush();
     }
 
-//    /** Comment it before submitting
+    /** Comment it before submitting
     private static class Node {
         private int value;  
         private Node left;  
@@ -49,7 +57,7 @@ public class Solution {
             this.value = value;
         }
     }
-//    **/
+    **/
     
     private static void test() throws IOException{
         Node node1 = new Node(null, null, 2);

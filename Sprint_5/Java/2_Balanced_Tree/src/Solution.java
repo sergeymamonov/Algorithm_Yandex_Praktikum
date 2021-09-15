@@ -1,42 +1,28 @@
-import java.util.LinkedList;
-
 public class Solution {
     public static boolean treeSolution(Node head) {
-        int minLevel = Integer.MAX_VALUE;
-        int maxLevel = Integer.MIN_VALUE;
-        int currentLevel = 1;
-        LinkedList<Node> list = new LinkedList<>();
-        list.add(head);
-        while (!list.isEmpty()) {
-            int listSize = list.size();
-            while (listSize > 0) {
-                Node currentNode = list.removeFirst();
-                if (currentNode.left == null && currentNode.right == null) {
-                    if (minLevel > currentLevel) {
-                        minLevel = currentLevel;
-                    }
-                    if (maxLevel < currentLevel) {
-                        maxLevel = currentLevel;
-                    }
-                } else {
-                    if (currentNode.left != null) {
-                        list.add(currentNode.left);
-                    }
-                    if (currentNode.right != null) {
-                        list.add(currentNode.right);
-                    }
-                }
-                listSize--;
-            }
-            if (Math.abs(maxLevel - minLevel) > 1) {
-                return false;
-            }
-            currentLevel++;
+        return DFS(head) != -1;
+    }
+
+    private static int DFS (Node node) {
+        if (node == null) {
+            return 0;
         }
-        System.out.println("currentLevel " + currentLevel);
-        System.out.println("minLevel " + minLevel);
-        System.out.println("maxLevel " + maxLevel);
-        return true;
+
+        int leftSubTreeHeight = DFS(node.left);
+        if (leftSubTreeHeight == -1) {
+            return -1;
+        }
+
+        int rightSubTreeHeight = DFS(node.right);
+        if (rightSubTreeHeight == -1) {
+            return -1;
+        }
+
+        if (Math.abs(leftSubTreeHeight - rightSubTreeHeight) > 1) {
+            return -1;
+        }
+
+        return Math.max(leftSubTreeHeight, rightSubTreeHeight) + 1;
     }
 
         /** Comment it before submitting

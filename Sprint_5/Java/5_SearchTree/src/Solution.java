@@ -1,41 +1,23 @@
-import java.util.ArrayList;
-
 public class Solution {
     public static boolean treeSolution(Node head) {
-        ArrayList<Integer> nodes = new ArrayList<>();
-        if (head.left != null) {
-            treeSolution(head.left);
-        }
-        nodes.add(head.value);
-        if (head.right != null) {
-            treeSolution(head.right);
+        return isBinTree(head, null, null);
+    }
+
+    public static boolean isBinTree(Node root, Node minNode, Node maxNode) {
+        if (root == null) {
+            return true;
         }
 
-        if (nodes.size() >= 2) {
-            int previous = nodes.get(0);
-            for (int i = 1; i < nodes.size(); i++) {
-                if (nodes.get(i) <= previous) {
-                    return false;
-                }
-            }
+        if (minNode != null && root.value <= minNode.value) {
+            return false;
         }
 
-//        nodes.add(head);
-//        while (nodes.iterator().hasNext()) {
-//            if (nodes.getFirst().left != null) {
-//                if (nodes.getFirst().left.value < nodes.getFirst().value) {
-//                    nodes.add(nodes.getFirst().left);
-//                } else {
-//                    return false;
-//                }
-//            }
-//            if (nodes.getFirst().right != null) {
-//                if (nodes.getFirst().right.value > nodes.getFirst().value) {
-//                    nodes.add(nodes.getFirst().right);
-//                }
-//            }
-//        }
-        return true;
+        if (maxNode != null && root.value >= maxNode.value) {
+            return false;
+        }
+
+        return isBinTree(root.left, minNode, root) && isBinTree(root.right, root, maxNode);
+
     }
 
     /**
