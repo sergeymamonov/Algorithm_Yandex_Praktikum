@@ -1,6 +1,7 @@
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Stack;
 
 public class Solution {
     public static void printRange(Node root, int L, int R, BufferedWriter writer) throws IOException {
@@ -14,8 +15,9 @@ public class Solution {
             printRange(root.getLeft(), L, R, writer);
         } else {
             printRange(root.getLeft(), L, R, writer);
-            writer.write(root.getValue());
-            printRange(root.getLeft(), L, R, writer);
+            writer.write(String.valueOf(root.getValue()));
+            writer.write("\n");
+            printRange(root.getRight(), L, R, writer);
         }
 
         writer.flush();
