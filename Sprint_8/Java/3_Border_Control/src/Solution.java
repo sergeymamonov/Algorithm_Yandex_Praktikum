@@ -7,17 +7,6 @@ public class Solution {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         String str1 = bufferedReader.readLine();
         String str2 = bufferedReader.readLine();
-        System.out.println(str1.length());
-        System.out.println(str2.length());
-        System.out.println(str1);
-        System.out.println("------------");
-        System.out.println(str2);
-        System.out.println("------------");
-
-        if (Math.abs(str1.length() - str2.length()) > 1) {
-            System.out.println("FAIL");
-            return;
-        }
 
         int i = 0;
         int j = 0;
@@ -50,10 +39,8 @@ public class Solution {
         }
 
         // strings here have equal length
-
-
         while (i < largest.length() - 1 && j < least.length() - 1) {
-            if (str1.charAt(i) == str2.charAt(j)) {
+            if (largest.charAt(i) == least.charAt(j)) {
                 i++;
                 j++;
             } else {
@@ -66,11 +53,6 @@ public class Solution {
                 shift = true;
             }
 
-//            if (Math.abs(i - j) > 1) {
-//                System.out.println("i: " + i + "\tj: " + j);
-//                System.out.println("FAIL_2");
-//                return;
-//            }
         }
         System.out.println("OK");
     }
