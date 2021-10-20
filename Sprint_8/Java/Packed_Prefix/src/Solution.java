@@ -1,14 +1,52 @@
+// 55107874
+//
+// Принцип работы алгоритма:
+//      Алгоритм основан на распаковке строки и нахождении наибольшего общего префикса (lcp) сравнением поэлементно всех строк.
+//      Распаковка осуществляется с помощью двух стеков. В один кладутся числа, которые содержатся в строке,
+//      во второй - буквы.
+//      Распаковка осуществляется проходом по входной строке и определением является ли текущий символ буквой, числом,
+//      открывающейся или закрывающейся скобкой.
+//          В случае, если символ буква, то он помещается в буфер.
+//          В случае, если символ число, то он помещается в стек для чисел.
+//          В случае, если встретилась открывающаяся скобка, то содержимое буфера кладется на стек, буфер очищается.
+//          В случае, если встретилась закрывающаяся скобка, то содержимое буфера копируется во временный буфер и
+//              копируется столько раз, какое число находится на вершине числового стека.
+//      Нахождение lcp осуществляется с помощью итерации по самому короткому распакованному слову. Полученная буква
+//      сравнивается с символами на такой же позиции в других словах. Как только символ в каком-либо слове отличается
+//      от символа на такой же позиции из самого короткого слова, то это означает что lcp не превосходит данной позиции.
+//
+// Обоснование корректности:
+//      Алгоритм корректен, так как два стека работают синхронно при распаковке строки и действия происходят только при
+//      встрече в строке открывающейся или закрывающейся скобок.
+//      При поиске lcp происходит посимвольное сравнение всех строк с наикратчайшей из входного набора.
+//
+// Временная сложность:
+//      Временная сложность будет складываться из:
+//          - распаковки строки, O(L), где L - суммарная длина входных слов,
+//          - нахождения lcp, O(L_shortest_word * n), где L_shortest_word - длина самого короткого
+//              входного слова, n - количество входных слов.
+//      Итоговая временная сложность будет составлять O(L + L_shortest_word * n).
+//
+// Пространственная сложность:
+//      Пространственная сложность складывается из:
+//          - стеков, суммарный размер которых не превосходит O(l), где l - длина входного слова,
+//          - двух буферов для хранения подстрок, O(l) и O(m * substr), где m * substr - максимальное произведение
+//              числа и относящейся к нему подстроки из входной строки.
+//      Итоговая пространственная сложность будет O(l * m + substr).
+
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.Stack;
 
 public class Solution {
+    public static String[] strings;
     public static int shortest;
 
     public static void main(String[] args) throws IOException {
-        String[] strings = readData();
-        System.out.println(longestCommonPrefix(strings));
+        strings = readData();
+        System.out.println(longestCommonPrefix());
     }
 
     private static String[] readData() throws IOException {
@@ -17,8 +55,7 @@ public class Solution {
         String[] strings = new String[stringsQuantity];
         shortest = Integer.MAX_VALUE;
         for (int i = 0; i < stringsQuantity; i++) {
-            strings[i] = unpackString2(bufferedReader.readLine());
-//            strings[i] = bufferedReader.readLine();
+            strings[i] = getFullString(bufferedReader.readLine());
             if (strings[i].length() < shortest) {
                 shortest = strings[i].length();
             }
@@ -26,77 +63,29 @@ public class Solution {
         return strings;
     }
 
-//    public static String getFullString(String str) {
-//        if (!str.contains("]")) {
-//            return str;
-//        }
-//
-//        int end = str.indexOf("]");
-//        int start = str.substring(0, end).lastIndexOf("[");
-//        int times = Integer.parseInt(str.substring(start - 1, start));
-//        String subStr = str.substring(start + 1, end);
-//        StringBuilder stringBuilder = new StringBuilder();
-//        stringBuilder.append(str, 0, start - 1);
-//        stringBuilder.append(subStr.repeat(times));
-//        if (end + 1 < str.length()) {
-//            stringBuilder.append(str.substring(end + 1));
-//        }
-//
-//        return getFullString(stringBuilder.toString());
-//    }
-
-    public static String unpackString2(String str) {
-        StringBuilder result = new StringBuilder();
-        StringBuilder buffer = new StringBuilder();
-        for (int i = 0; i < str.length(); i++) {
-            if (Character.isDigit(str.charAt(i))) {
-                int times = str.charAt(i);
-                i += 2;
-                while (str.charAt(i) != ']') {
-                    buffer.append(str.charAt(i++));
-//                    System.out.println(str.charAt(i));
-                }
-                for (int j = 0; j < times; j++) {
-                    result.append(buffer);
-                }
-                buffer.setLength(0);
-            }
-            result.append(str.charAt(i));
+    public static String getFullString(String str) {
+        Stack<Integer> intStack = new Stack<>();
+        Stack<StringBuilder> strStack = new Stack<>();
+        StringBuilder current = new StringBuilder();
+        int k = 0;
+        for (char ch : str.toCharArray()) {
+            if (Character.isDigit(ch)) {
+                k = ch - '0';
+            } else if ( ch == '[') {
+                intStack.push(k);
+                strStack.push(current);
+                current = new StringBuilder();
+                k = 0;
+            } else if (ch == ']') {
+                StringBuilder tmp = current;
+                current = strStack.pop();
+                for (k = intStack.pop(); k > 0; --k) current.append(tmp);
+            } else current.append(ch);
         }
-        return result.toString();
+        return current.toString();
     }
 
-    public static String unpackString(String str) {
-        if (!str.contains("]")) {
-            return str;
-        }
-
-        int end = str.indexOf("]");
-        int start = str.substring(0, end).lastIndexOf("[");
-        int times = Integer.parseInt(str.substring(start - 1, start));
-        String subStr = str.substring(start + 1, end);
-        int currentIndex = 0;
-//        int len = start - 1 + times * subStr.length() + str.length() - end - 1;
-        char[] result = new char[start - 1 + times * subStr.length() + str.length() - end - 1];
-        System.arraycopy(str.toCharArray(), 0, result, currentIndex, start - 1);
-        currentIndex += start - 1;
-        for (int i = 0; i < times; i++) {
-            System.arraycopy(subStr.toCharArray(), 0, result, currentIndex, subStr.length());
-            currentIndex += subStr.length();
-        }
-        if (end + 1 < str.length()) {
-            System.arraycopy(str.toCharArray(), end + 1, result, currentIndex, str.substring(end + 1).length());
-        }
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (char c : result) {
-            stringBuilder.append(c);
-        }
-//        return unpackString(stringBuilder.toString());
-        return stringBuilder.toString();
-    }
-
-    private static String longestCommonPrefix(String[] strings) {
+    public static String longestCommonPrefix() {
         int maxCommonPrefix = 0;
         for (int i = 0; i < shortest; i++) {
             char currentLetter = strings[0].charAt(i);
@@ -109,51 +98,5 @@ public class Solution {
         }
         return strings[0].substring(0, maxCommonPrefix);
     }
-
-/*
-    private static String longestCommonPrefix(String[] strings) {
-        int maxCommonPrefix = 0;
-        for (int i = 0; i < strings[0].length(); i++) {
-
-            char currentLetter = strings[0].charAt(i);
-            if (currentLetter == '[' || Character.isDigit(currentLetter)) {
-                while (!Character.isLetter(strings[0].charAt(i))) {
-                    strings[0] = unpackString(strings[0]);
-                }
-            }
-            currentLetter = strings[0].charAt(i);
-//            for (String string : strings) {
-                for (int j = 1; j < strings.length; j++) {
-                    String string = strings[j];
-
-                try {
-                    char currentLetterSecond = string.charAt(i);
-                    if (currentLetterSecond == '[' || Character.isDigit(currentLetterSecond)) {
-                        while (!Character.isLetter(strings[j].charAt(i))) {
-                            strings[j] = unpackString(strings[j]);
-                        }
-                    }
-                    currentLetterSecond = strings[j].charAt(i);
-                    if (strings[j].charAt(i) != currentLetter) {
-                        return strings[0].substring(0, maxCommonPrefix);
-                    }
-                } catch (Exception e) {
-                    return strings[0].substring(0, maxCommonPrefix);
-                }
-            }
-            maxCommonPrefix++;
-        }
-        return strings[0].substring(0, maxCommonPrefix);
-    }
- */
-
-    private static String longestCommonPrefix2(String[] strings) {
-        Arrays.sort(strings);
-        int shortestString = Math.min(strings[0].length(), strings[strings.length - 1].length());
-        int i = 0;
-        while (i < shortestString && strings[0].charAt(i) == strings[strings.length - 1].charAt(i)) {
-            i++;
-        }
-        return strings[0].substring(0, i);
-    }
 }
+
